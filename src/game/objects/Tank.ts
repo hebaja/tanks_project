@@ -21,7 +21,7 @@ export class Tank extends Physics.Arcade.Sprite {
 	}
 
 	constructor(scene: Scene) {
-		super(scene, 512, 512, 'tank')
+		super(scene, 25, 25, 'tank')
 		this.keyboard = scene.input.keyboard
 		if (!this.keyboard) {
 			throw new Error('Keyboard plugin not available')
@@ -41,7 +41,7 @@ export class Tank extends Physics.Arcade.Sprite {
 			W: Input.Keyboard.KeyCodes.W,
 			S: Input.Keyboard.KeyCodes.S
 		})
-		this.angle = 180
+		this.angle = 0
 	}
 
 	destroy(fromScene?: boolean): void {

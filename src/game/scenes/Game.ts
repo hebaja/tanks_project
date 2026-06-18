@@ -22,12 +22,18 @@ export class Game extends Scene
 			'corner',
 			'map/corner.png'
 		);
+		this.load.image(
+			'stone',
+			'map/stone.png'
+		);
 		Tank.preload(this)
     }
 
     create ()
     {
 		const map = this.make.tilemap({ key: 'level' })
+
+		console.log(map)
 
 		const terrainTileset = map.addTilesetImage(
 			'terrain_tileset',
@@ -37,13 +43,28 @@ export class Game extends Scene
 			'corner',
 			'corner'
 		);
-		if (!terrainTileset || !cornerTileset) {
+		const blocksTileset = map.addTilesetImage(
+			'stone',
+			'stone'
+		);
+
+		if (!terrainTileset || !cornerTileset || !blocksTileset) {
             throw new Error("Tileset not found");
         }
-		const layer = map.createLayer(
+		const backgroundLayer = map.createLayer(
 			"background",
 			[terrainTileset, cornerTileset]
+		);
+		const blocksLayer = map.createLayer(
+			"blocks",
+			[blocksTileset]
 		)
+		backgroundLayer.depth = 0
+		blocksLayer.depth = 10
 		this.tank = new Tank(this)
+		this.tank.depth = 30
+		blocksLayer.setCollisionByExclusion([-1]);
+
+		this.physics.add.collider(this.tank, blocksLayer);
     }
 }
