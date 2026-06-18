@@ -1,9 +1,11 @@
 import { Scene } from 'phaser';
 import { Tank } from '../objects/Tank';
+import { Projectile } from '../objects/projectile';
 
 export class Game extends Scene
 {
 	tank: Tank
+	projectile: Projectile
 
     constructor ()
     {
@@ -27,13 +29,12 @@ export class Game extends Scene
 			'map/stone.png'
 		);
 		Tank.preload(this)
+		Projectile.preload(this)
     }
 
     create ()
     {
 		const map = this.make.tilemap({ key: 'level' })
-
-		console.log(map)
 
 		const terrainTileset = map.addTilesetImage(
 			'terrain_tileset',
@@ -61,7 +62,12 @@ export class Game extends Scene
 		)
 		backgroundLayer.depth = 0
 		blocksLayer.depth = 10
+
 		this.tank = new Tank(this)
+		// this.projectile = new Projectile(this)
+
+		console.log(this.projectile)
+		
 		this.tank.depth = 30
 		blocksLayer.setCollisionByExclusion([-1]);
 

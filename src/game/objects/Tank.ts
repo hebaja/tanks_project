@@ -66,4 +66,8 @@ export class Tank extends Physics.Arcade.Sprite {
 	        this.setVelocity(velocity.x, velocity.y)
 		}
 	}
+
+	fire() {
+
+	}
 }
