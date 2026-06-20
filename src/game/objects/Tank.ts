@@ -1,4 +1,5 @@
 import { Physics, Input, Scenes, Scene } from 'phaser';
+import { Projectile } from './Projectile';
 
 type TankControls = {
   left: Input.Keyboard.Key;
@@ -15,6 +16,7 @@ type TankControls = {
 export class Tank extends Physics.Arcade.Sprite {
 	private controls: TankControls
     private keyboard: any
+	private mainScene: Scene
 
 	static preload(scene: Scene) {
 		scene.load.image('tank', 'sprites/tank_blue.png')
@@ -30,6 +32,7 @@ export class Tank extends Physics.Arcade.Sprite {
 		scene.add.existing(this)
 		scene.events.on(Scenes.Events.UPDATE, this.update, this);
 		this.setCollideWorldBounds(true)
+		this.mainScene = scene
 
 		this.controls = this.keyboard?.addKeys({
 			left: Input.Keyboard.KeyCodes.LEFT,
@@ -39,7 +42,8 @@ export class Tank extends Physics.Arcade.Sprite {
 			A: Input.Keyboard.KeyCodes.A,
 			D: Input.Keyboard.KeyCodes.D,
 			W: Input.Keyboard.KeyCodes.W,
-			S: Input.Keyboard.KeyCodes.S
+			S: Input.Keyboard.KeyCodes.S,
+			J: Input.Keyboard.KeyCodes.J
 		})
 		this.angle = 0
 	}
@@ -65,9 +69,13 @@ export class Tank extends Physics.Arcade.Sprite {
 			const velocity = this.scene.physics.velocityFromAngle(this.angle - 90 + 180, 150)
 	        this.setVelocity(velocity.x, velocity.y)
 		}
+		if (this.controls.J.isDown) {
+			this.fire()
+		}
 	}
 
 	fire() {
-
+		const projectile = new Projectile(this.mainScene, this.x, this.y, this.angle)
+		this.mainScene.events.emit('projectileFired', projectile)
 	}
 }

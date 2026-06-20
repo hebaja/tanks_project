@@ -1,11 +1,10 @@
 import { Scene } from 'phaser';
 import { Tank } from '../objects/Tank';
-import { Projectile } from '../objects/projectile';
+import { Projectile } from '../objects/Projectile';
 
 export class Game extends Scene
 {
 	tank: Tank
-	projectile: Projectile
 
     constructor ()
     {
@@ -64,13 +63,20 @@ export class Game extends Scene
 		blocksLayer.depth = 10
 
 		this.tank = new Tank(this)
-		// this.projectile = new Projectile(this)
 
-		console.log(this.projectile)
-		
 		this.tank.depth = 30
 		blocksLayer.setCollisionByExclusion([-1]);
 
 		this.physics.add.collider(this.tank, blocksLayer);
+
+		this.events.on('projectileFired', (projectile: Projectile) => {
+			this.physics.add.collider(projectile, blocksLayer, () => {
+				projectile.destroy()
+			})
+		})
     }
+
+	update() {
+	    
+	}
 }
