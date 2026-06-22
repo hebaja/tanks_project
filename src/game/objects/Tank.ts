@@ -1,4 +1,5 @@
 import { Physics, Input, Scenes, Scene } from 'phaser';
+import { Math as PhaserMath } from 'phaser';
 import { Projectile } from './Projectile';
 
 type TankControls = {
@@ -13,13 +14,20 @@ type TankControls = {
   J: Input.Keyboard.Key;
 }
 
+// type Pair<T, U> = [T, U]
+type Pair = [x: number, y: number];
+
+
 export class Tank extends Physics.Arcade.Sprite {
 	private controls: TankControls
     private keyboard: any
 	private mainScene: Scene
+	private projectile: Projectile | null = null
+	private sparkShot?: Phaser.GameObjects.Sprite
 
 	static preload(scene: Scene) {
 		scene.load.image('tank', 'sprites/tank_blue.png')
+		scene.load.image('spark', 'sprites/shotOrange.png')
 	}
 
 	constructor(scene: Scene) {
@@ -72,10 +80,54 @@ export class Tank extends Physics.Arcade.Sprite {
 		if (this.controls.J.isDown) {
 			this.fire()
 		}
+
+
+		if (this.sparkShot) {
+			const tips = this.getTipTank(36)
+			this.sparkShot.setPosition(
+				tips[0],
+				tips[1]
+			);
+		}
+	}
+
+	getTipTank(distance: number) : Pair {
+		const tipX = this.x - Math.cos(PhaserMath.DegToRad(this.angle - 90)) * distance
+		const tipY = this.y - Math.sin(PhaserMath.DegToRad(this.angle - 90)) * distance
+
+		const tips: Pair = [tipX, tipY]
+
+		return (tips)
+	}
+
+	setSparkShot() {
+		this.sparkShot?.destroy()
+		const tips = this.getTipTank(36)
+		this.sparkShot = this.scene.add.sprite(tips[0], tips[1], 'spark')
+		this.sparkShot.angle = this.angle
+		this.sparkShot.depth = 31
 	}
 
 	fire() {
-		const projectile = new Projectile(this.mainScene, this.x, this.y, this.angle)
-		this.mainScene.events.emit('projectileFired', projectile)
+		if (this.projectile)
+			return;
+
+		const tip = this.getTipTank(25) 
+
+		this.setSparkShot()
+
+		this.scene.time.delayedCall(100, () => {
+			this.sparkShot?.destroy()
+			this.sparkShot = undefined
+		})
+
+		this.projectile = new Projectile(this.mainScene, tip[0], tip[1], this.angle)
+		this.projectile.depth = 5
+		
+		this.mainScene.events.emit('projectileFired', this.projectile)
+
+		this.projectile.once('destroy', () => {
+			this.projectile = null
+		})
 	}
 }
