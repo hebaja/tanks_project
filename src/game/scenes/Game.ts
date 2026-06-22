@@ -29,6 +29,16 @@ export class Game extends Scene
 		);
 		Tank.preload(this)
 		Projectile.preload(this)
+
+
+		this.load.image('explosion_1', 'sprites/explosion1.png')
+		this.load.image('explosion_2', 'sprites/explosion2.png')
+		this.load.image('explosion_3', 'sprites/explosion3.png')
+		this.load.image('explosion_4', 'sprites/explosion4.png')
+		this.load.image('explosion_5', 'sprites/explosion5.png')
+
+
+
     }
 
     create ()
@@ -47,6 +57,27 @@ export class Game extends Scene
 			'stone',
 			'stone'
 		);
+		
+		this.anims.create({
+		key: 'explosion',
+		frames: [
+			{ key: 'explosion_1' },
+			{ key: 'explosion_2' },
+			{ key: 'explosion_3' },
+			{ key: 'explosion_4' },
+			{ key: 'explosion_5' },
+		],
+		frameRate: 10,
+		repeat: 1
+		});
+
+
+		const sprite = this.add.sprite(400, 300, 'explosion_1');
+
+		sprite.depth = 100;
+
+		sprite.play("explosion")
+
 
 		if (!terrainTileset || !cornerTileset || !blocksTileset) {
             throw new Error("Tileset not found");
