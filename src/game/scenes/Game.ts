@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { Tank } from '../objects/Tank';
 import { Projectile } from '../objects/Projectile';
+import { ExplosionManager } from '../managers/ExplosionManager';
 
 export class Game extends Scene
 {
@@ -29,21 +30,14 @@ export class Game extends Scene
 		);
 		Tank.preload(this)
 		Projectile.preload(this)
-
-
-		this.load.image('explosion_1', 'sprites/explosion1.png')
-		this.load.image('explosion_2', 'sprites/explosion2.png')
-		this.load.image('explosion_3', 'sprites/explosion3.png')
-		this.load.image('explosion_4', 'sprites/explosion4.png')
-		this.load.image('explosion_5', 'sprites/explosion5.png')
-
-
+		ExplosionManager.preload(this)
 
     }
 
     create ()
     {
 		const map = this.make.tilemap({ key: 'level' })
+		const em = new ExplosionManager(this)
 
 		const terrainTileset = map.addTilesetImage(
 			'terrain_tileset',
@@ -57,27 +51,6 @@ export class Game extends Scene
 			'stone',
 			'stone'
 		);
-		
-		this.anims.create({
-		key: 'explosion',
-		frames: [
-			{ key: 'explosion_1' },
-			{ key: 'explosion_2' },
-			{ key: 'explosion_3' },
-			{ key: 'explosion_4' },
-			{ key: 'explosion_5' },
-		],
-		frameRate: 10,
-		repeat: 1
-		});
-
-
-		const sprite = this.add.sprite(400, 300, 'explosion_1');
-
-		sprite.depth = 100;
-
-		sprite.play("explosion")
-
 
 		if (!terrainTileset || !cornerTileset || !blocksTileset) {
             throw new Error("Tileset not found");
@@ -101,8 +74,20 @@ export class Game extends Scene
 		this.physics.add.collider(this.tank, blocksLayer);
 
 		this.events.on('projectileFired', (projectile: Projectile) => {
-			this.physics.add.collider(projectile, blocksLayer, () => {
-				projectile.destroy()
+			this.physics.add.collider(
+				projectile,
+				blocksLayer, 
+				(p, b) => {
+					const blockTile = b as Phaser.Tilemaps.Tile
+					const proj = p as Projectile
+
+					this.events.emit("explosion", {
+						x: blockTile.getCenterX(),
+						y: blockTile.getCenterY(),
+						type: "small"
+					})
+					blocksLayer.removeTileAt(blockTile.x, blockTile.y)
+					proj.destroy()
 			})
 		})
     }
