@@ -1,6 +1,6 @@
-import { Physics, Input, Scenes, Scene } from 'phaser';
-import { Math as PhaserMath } from 'phaser';
-import { Projectile } from './Projectile';
+import { Physics, Input, Scenes, Scene } from 'phaser'
+import { Math as PhaserMath } from 'phaser'
+import { Projectile } from './Projectile'
 
 type TankControls = {
   left: Input.Keyboard.Key;
@@ -77,7 +77,7 @@ export class Tank extends Physics.Arcade.Sprite {
 			const velocity = this.scene.physics.velocityFromAngle(this.angle - 90 + 180, 150)
 	        this.setVelocity(velocity.x, velocity.y)
 		}
-		if (this.controls.J.isDown) {
+		if (Input.Keyboard.JustDown(this.controls.J)) {
 			this.fire()
 		}
 
