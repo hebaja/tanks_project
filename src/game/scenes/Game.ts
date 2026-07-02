@@ -2,6 +2,7 @@ import { Scene } from 'phaser';
 import { Tank } from '../objects/Tank';
 import { Projectile } from '../objects/Projectile';
 import { ExplosionManager } from '../managers/ExplosionManager';
+import { Barrel } from '../objects/Barrel';
 
 export class Game extends Scene {
 	tank: Tank
@@ -29,15 +30,18 @@ export class Game extends Scene {
 			'rock',
 			'map/rock.png'
 		);
+
 		Tank.preload(this)
 		Projectile.preload(this)
 		ExplosionManager.preload(this)
+		Barrel.preload(this)
 
 	}
 
 	create() {
 		const map = this.make.tilemap({ key: 'level' })
 		const em = new ExplosionManager(this)
+
 
 		const terrainTileset = map.addTilesetImage(
 			'terrain_tileset',
@@ -84,6 +88,9 @@ export class Game extends Scene {
 
 		this.physics.add.collider(this.tank, blocksLayer);
 		this.physics.add.collider(this.tank, blocksHardLayer);
+
+
+		const barrel = new Barrel(this, 25, 25)
 
 		this.events.on('projectileFired', (projectile: Projectile) => {
 			this.physics.add.collider(
