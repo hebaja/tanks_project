@@ -96,7 +96,7 @@ export class Game extends Scene {
 					this.events.emit("explosion", {
 						x: blockTile.getCenterX(),
 						y: blockTile.getCenterY(),
-						type: "small"
+						type: "explosion"
 					})
 					blocksLayer.removeTileAt(blockTile.x, blockTile.y)
 					proj.destroy()
@@ -106,6 +106,12 @@ export class Game extends Scene {
 				blocksHardLayer,
 				(p) => {
 					const proj = p as Projectile
+
+					this.events.emit("explosion_smoke", {
+						x: proj.x,
+						y: proj.y,
+						type: "explosion_smoke"
+					})
 					proj.destroy()
 				})
 		})
