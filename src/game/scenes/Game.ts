@@ -3,18 +3,15 @@ import { Tank } from '../objects/Tank';
 import { Projectile } from '../objects/Projectile';
 import { ExplosionManager } from '../managers/ExplosionManager';
 
-export class Game extends Scene
-{
+export class Game extends Scene {
 	tank: Tank
 
-    constructor ()
-    {
-        super('Game');
-    }
+	constructor() {
+		super('Game');
+	}
 
-    preload ()
-    {
-        this.load.setPath('assets');
+	preload() {
+		this.load.setPath('assets');
 		this.load.tilemapTiledJSON('level', 'map/tanks_map.json')
 		this.load.image(
 			'terrain_tileset',
@@ -28,14 +25,17 @@ export class Game extends Scene
 			'stone',
 			'map/stone.png'
 		);
+		this.load.image(
+			'rock',
+			'map/rock.png'
+		);
 		Tank.preload(this)
 		Projectile.preload(this)
 		ExplosionManager.preload(this)
 
-    }
+	}
 
-    create ()
-    {
+	create() {
 		const map = this.make.tilemap({ key: 'level' })
 		const em = new ExplosionManager(this)
 
@@ -51,10 +51,14 @@ export class Game extends Scene
 			'stone',
 			'stone'
 		);
+		const blocksHardTileset = map.addTilesetImage(
+			'rock',
+			'rock'
+		);
 
-		if (!terrainTileset || !cornerTileset || !blocksTileset) {
-            throw new Error("Tileset not found");
-        }
+		if (!terrainTileset || !cornerTileset || !blocksTileset || !blocksHardTileset) {
+			throw new Error("Tileset not found");
+		}
 		const backgroundLayer = map.createLayer(
 			"background",
 			[terrainTileset, cornerTileset]
@@ -63,20 +67,28 @@ export class Game extends Scene
 			"blocks",
 			[blocksTileset]
 		)
+		const blocksHardLayer = map.createLayer(
+			"blocks_hard",
+			[blocksHardTileset]
+		)
+
 		backgroundLayer.depth = 0
 		blocksLayer.depth = 10
+		blocksHardLayer.depth = 10
 
 		this.tank = new Tank(this)
 
 		this.tank.depth = 30
 		blocksLayer.setCollisionByExclusion([-1]);
+		blocksHardLayer.setCollisionByExclusion([-1]);
 
 		this.physics.add.collider(this.tank, blocksLayer);
+		this.physics.add.collider(this.tank, blocksHardLayer);
 
 		this.events.on('projectileFired', (projectile: Projectile) => {
 			this.physics.add.collider(
 				projectile,
-				blocksLayer, 
+				blocksLayer,
 				(p, b) => {
 					const blockTile = b as Phaser.Tilemaps.Tile
 					const proj = p as Projectile
@@ -88,11 +100,18 @@ export class Game extends Scene
 					})
 					blocksLayer.removeTileAt(blockTile.x, blockTile.y)
 					proj.destroy()
-			})
+				})
+			this.physics.add.collider(
+				projectile,
+				blocksHardLayer,
+				(p) => {
+					const proj = p as Projectile
+					proj.destroy()
+				})
 		})
-    }
+	}
 
 	update() {
-	    
+
 	}
 }
