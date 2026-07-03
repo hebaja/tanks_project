@@ -5,7 +5,7 @@ export class Projectile extends Physics.Arcade.Sprite {
 	static preload(scene: Scene) {
 		scene.load.image('projectile', 'sprites/bulletBlue1_outline.png')
 	}
-	
+
 	constructor(scene: Scene, x: number, y: number, angle: number) {
 		super(scene, x, y, 'projectile')
 
@@ -19,18 +19,17 @@ export class Projectile extends Physics.Arcade.Sprite {
 		})
 
 		this.angle = angle - 180;
-		
+
 		const velocity = this.scene.physics.velocityFromAngle(this.angle - 90, 400)
 		this.setVelocity(velocity.x, velocity.y)
-		
 	}
 
 	destroy(fromScene?: boolean): void {
-		super.destroy(fromScene) 
+		super.destroy(fromScene)
 	}
 
 	update() {
-	    
+
 	}
 
 }

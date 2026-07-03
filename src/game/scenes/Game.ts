@@ -95,7 +95,26 @@ export class Game extends Scene {
 		this.physics.add.collider(this.tank, blocksHardLayer);
 
 		const randomPos = Barrel.generateRandomPositions(map.width, map.height, 10, blocksLayer, blocksHardLayer)
-		Barrel.generateRandomBarrels(this, randomPos, map)
+		const barrels = Barrel.generateRandomBarrels(this, randomPos, map)
+
+		const barrelGroup = this.physics.add.group()
+
+		for (let i = 0; i < barrels.length; i++) {
+			barrelGroup.add(barrels[i])
+		}
+
+		// for (let i = 0; i < barrelGroup.addCollidesWith)
+		//
+
+		// this.physics.add.collider(this.tank, barrelGroup)
+
+
+		barrelGroup.children.forEach((child) => {
+			(child as Barrel).setImmovable(true)
+			this.physics.add.collider(child, this.tank)
+		})
+
+
 
 		this.events.on('projectileFired', (projectile: Projectile) => {
 			this.physics.add.collider(
@@ -125,6 +144,20 @@ export class Game extends Scene {
 						type: "explosion_smoke"
 					})
 					proj.destroy()
+				})
+			this.physics.add.collider(
+				projectile,
+				barrelGroup,
+				(p, b) => {
+					const proj = p as Projectile
+					const barrel = b as Barrel
+					this.events.emit("explosion", {
+						x: barrel.x,
+						y: barrel.y,
+						type: "explosion"
+					})
+					proj.destroy()
+					barrel.destroy()
 				})
 		})
 	}

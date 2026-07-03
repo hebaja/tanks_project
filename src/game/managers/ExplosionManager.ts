@@ -35,6 +35,11 @@ export class ExplosionManager {
 			this.handleExplosion,
 			this
 		)
+		this.scene.events.on(
+			"explosion_barrel",
+			this.handleExplosion,
+			this
+		)
 	}
 
 	createAnims() {
@@ -69,23 +74,26 @@ export class ExplosionManager {
 		y: number,
 		type: string
 	}): void {
+
+		var sprite: Phaser.GameObjects.Sprite
+
 		switch (data.type) {
 			case 'explosion':
-				const sprite = this.scene.add.sprite(data.x, data.y, 'explosion_1');
-				sprite.depth = 100;
+				sprite = this.scene.add.sprite(data.x, data.y, 'explosion_1')
+				sprite.depth = 100
 				sprite.play("explosion")
 				sprite.once('animationcomplete-explosion', () => {
 					sprite.destroy()
 				})
 				break
 			case 'explosion_smoke':
-				const sprite_x = this.scene.add.sprite(data.x, data.y, 'explosion_smoke_1');
-				sprite_x.depth = 100;
-				sprite_x.play("explosion_smoke")
-				sprite_x.once('animationcomplete-explosion_smoke', () => {
-					sprite_x.destroy()
+				sprite = this.scene.add.sprite(data.x, data.y, 'explosion_smoke_1')
+				sprite.depth = 100
+				sprite.play("explosion_smoke")
+				sprite.once('animationcomplete-explosion_smoke', () => {
+					sprite.destroy()
 				})
-				break;
+				break
 			default:
 				console.log('explosion event unknown')
 		}
