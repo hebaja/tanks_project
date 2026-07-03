@@ -3,9 +3,11 @@ import { Tank } from '../objects/Tank';
 import { Projectile } from '../objects/Projectile';
 import { ExplosionManager } from '../managers/ExplosionManager';
 import { Barrel } from '../objects/Barrel';
+import { Oil } from '../objects/Oil';
 
 export class Game extends Scene {
 	tank: Tank
+	oils: Oil[] = []
 
 	constructor() {
 		super('Game');
@@ -35,7 +37,7 @@ export class Game extends Scene {
 		Projectile.preload(this)
 		ExplosionManager.preload(this)
 		Barrel.preload(this)
-
+		Oil.preload(this)
 	}
 
 	create() {
@@ -45,7 +47,6 @@ export class Game extends Scene {
 			throw new Error('Map could not be initialized')
 
 		const em = new ExplosionManager(this)
-
 
 		const terrainTileset = map.addTilesetImage(
 			'terrain_tileset',
@@ -103,18 +104,10 @@ export class Game extends Scene {
 			barrelGroup.add(barrels[i])
 		}
 
-		// for (let i = 0; i < barrelGroup.addCollidesWith)
-		//
-
-		// this.physics.add.collider(this.tank, barrelGroup)
-
-
 		barrelGroup.children.forEach((child) => {
 			(child as Barrel).setImmovable(true)
 			this.physics.add.collider(child, this.tank)
 		})
-
-
 
 		this.events.on('projectileFired', (projectile: Projectile) => {
 			this.physics.add.collider(
@@ -151,13 +144,19 @@ export class Game extends Scene {
 				(p, b) => {
 					const proj = p as Projectile
 					const barrel = b as Barrel
+					const barrelX = barrel.x
+					const barrelY = barrel.y
+
 					this.events.emit("explosion", {
-						x: barrel.x,
-						y: barrel.y,
+						x: barrelX,
+						y: barrelY,
 						type: "explosion"
 					})
 					proj.destroy()
 					barrel.destroy()
+					this.time.delayedCall(400, () => {
+						this.oils.push(new Oil(this, barrelX, barrelY))
+					})
 				})
 		})
 	}

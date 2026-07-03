@@ -14,14 +14,11 @@ type BarrelPos = {
 
 export class Barrel extends Physics.Arcade.Sprite {
 
-
 	static preload(scene: Scene) {
 		scene.load.image('barrel_black', 'barrels/barrel_black.png')
 		scene.load.image('barrel_green', 'barrels/barrel_green.png')
 		scene.load.image('barrel_red', 'barrels/barrel_red.png')
 		scene.load.image('barrel_rust', 'barrels/barrel_rust.png')
-
-		scene.load.image('oil', 'barrels/oil_spill.png')
 	}
 
 	static generateRandomPositions(
@@ -70,6 +67,10 @@ export class Barrel extends Physics.Arcade.Sprite {
 		scene.physics.add.existing(this)
 
 		this.setImmovable(true)
+
+		// this.once('destroy', () => {
+		// 	console.log("barrel destroy", this.x, this.y)
+		// })
 	}
 
 	destroy(fromScene?: boolean): void {

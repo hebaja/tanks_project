@@ -3,15 +3,15 @@ import { Math as PhaserMath } from 'phaser'
 import { Projectile } from './Projectile'
 
 type TankControls = {
-  left: Input.Keyboard.Key;
-  right: Input.Keyboard.Key;
-  up: Input.Keyboard.Key;
-  down: Input.Keyboard.Key;
-  A: Input.Keyboard.Key;
-  D: Input.Keyboard.Key;
-  W: Input.Keyboard.Key;
-  S: Input.Keyboard.Key;
-  J: Input.Keyboard.Key;
+	left: Input.Keyboard.Key;
+	right: Input.Keyboard.Key;
+	up: Input.Keyboard.Key;
+	down: Input.Keyboard.Key;
+	A: Input.Keyboard.Key;
+	D: Input.Keyboard.Key;
+	W: Input.Keyboard.Key;
+	S: Input.Keyboard.Key;
+	J: Input.Keyboard.Key;
 }
 
 // type Pair<T, U> = [T, U]
@@ -20,7 +20,7 @@ type Pair = [x: number, y: number];
 
 export class Tank extends Physics.Arcade.Sprite {
 	private controls: TankControls
-    private keyboard: any
+	private keyboard: any
 	private mainScene: Scene
 	private projectile: Projectile | null = null
 	private sparkShot?: Phaser.GameObjects.Sprite
@@ -58,7 +58,7 @@ export class Tank extends Physics.Arcade.Sprite {
 
 	destroy(fromScene?: boolean): void {
 		this.scene?.events.off(Scenes.Events.UPDATE, this.update, this)
-	    super.destroy(fromScene)
+		super.destroy(fromScene)
 	}
 
 	update() {
@@ -75,7 +75,7 @@ export class Tank extends Physics.Arcade.Sprite {
 		}
 		if (this.controls.up.isDown || this.controls.W.isDown) {
 			const velocity = this.scene.physics.velocityFromAngle(this.angle - 90 + 180, 150)
-	        this.setVelocity(velocity.x, velocity.y)
+			this.setVelocity(velocity.x, velocity.y)
 		}
 		if (Input.Keyboard.JustDown(this.controls.J)) {
 			this.fire()
@@ -91,7 +91,7 @@ export class Tank extends Physics.Arcade.Sprite {
 		}
 	}
 
-	getTipTank(distance: number) : Pair {
+	getTipTank(distance: number): Pair {
 		const tipX = this.x - Math.cos(PhaserMath.DegToRad(this.angle - 90)) * distance
 		const tipY = this.y - Math.sin(PhaserMath.DegToRad(this.angle - 90)) * distance
 
@@ -112,7 +112,7 @@ export class Tank extends Physics.Arcade.Sprite {
 		if (this.projectile)
 			return;
 
-		const tip = this.getTipTank(25) 
+		const tip = this.getTipTank(25)
 
 		this.setSparkShot()
 
@@ -123,7 +123,7 @@ export class Tank extends Physics.Arcade.Sprite {
 
 		this.projectile = new Projectile(this.mainScene, tip[0], tip[1], this.angle)
 		this.projectile.depth = 5
-		
+
 		this.mainScene.events.emit('projectileFired', this.projectile)
 
 		this.projectile.once('destroy', () => {
