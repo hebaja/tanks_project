@@ -40,6 +40,10 @@ export class Game extends Scene {
 
 	create() {
 		const map = this.make.tilemap({ key: 'level' })
+
+		if (!map)
+			throw new Error('Map could not be initialized')
+
 		const em = new ExplosionManager(this)
 
 
@@ -76,6 +80,7 @@ export class Game extends Scene {
 			[blocksHardTileset]
 		)
 
+
 		backgroundLayer.depth = 0
 		blocksLayer.depth = 10
 		blocksHardLayer.depth = 10
@@ -89,8 +94,8 @@ export class Game extends Scene {
 		this.physics.add.collider(this.tank, blocksLayer);
 		this.physics.add.collider(this.tank, blocksHardLayer);
 
-
-		const barrel = new Barrel(this, 25, 25)
+		const randomPos = Barrel.generateRandomPositions(map.width, map.height, 10, blocksLayer, blocksHardLayer)
+		Barrel.generateRandomBarrels(this, randomPos, map)
 
 		this.events.on('projectileFired', (projectile: Projectile) => {
 			this.physics.add.collider(
