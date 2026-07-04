@@ -167,6 +167,7 @@ export class Game extends Scene {
 		for (let i = 0; i < this.oils.length; i++) {
 			this.physics.world.overlap(this.tank, this.oils[i], () => {
 				onOil = true
+				console.log('touching')
 			})
 		}
 		this.tank.slowDown(onOil)
