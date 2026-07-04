@@ -65,12 +65,7 @@ export class Barrel extends Physics.Arcade.Sprite {
 
 		scene.add.existing(this)
 		scene.physics.add.existing(this)
-
 		this.setImmovable(true)
-
-		// this.once('destroy', () => {
-		// 	console.log("barrel destroy", this.x, this.y)
-		// })
 	}
 
 	destroy(fromScene?: boolean): void {

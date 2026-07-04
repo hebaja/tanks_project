@@ -10,5 +10,6 @@ export class Oil extends GameObjects.Sprite {
 		super(scene, x, y, 'oil')
 
 		scene.add.existing(this)
+		scene.physics.add.existing(this)
 	}
 }

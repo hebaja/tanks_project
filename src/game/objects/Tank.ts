@@ -14,9 +14,7 @@ type TankControls = {
 	J: Input.Keyboard.Key;
 }
 
-// type Pair<T, U> = [T, U]
 type Pair = [x: number, y: number];
-
 
 export class Tank extends Physics.Arcade.Sprite {
 	private controls: TankControls
@@ -24,6 +22,9 @@ export class Tank extends Physics.Arcade.Sprite {
 	private mainScene: Scene
 	private projectile: Projectile | null = null
 	private sparkShot?: Phaser.GameObjects.Sprite
+	private speed: number = 150
+	private turnSpeed: number = 2
+	private isSlow: boolean = false
 
 	static preload(scene: Scene) {
 		scene.load.image('tank', 'sprites/tank_blue.png')
@@ -62,25 +63,33 @@ export class Tank extends Physics.Arcade.Sprite {
 	}
 
 	update() {
+
 		this.setVelocity(0, 0)
+		if (this.isSlow) {
+			this.turnSpeed = 1
+			this.speed = 50
+		} else {
+			this.turnSpeed = 2
+			this.speed = 150
+		}
+
 		if (this.controls.left.isDown || this.controls.A.isDown) {
-			this.angle -= 2
+			this.angle -= this.turnSpeed
 		}
 		if (this.controls.right.isDown || this.controls.D.isDown) {
-			this.angle += 2
+			this.angle += this.turnSpeed
 		}
 		if (this.controls.down.isDown || this.controls.S.isDown) {
-			const velocity = this.scene.physics.velocityFromAngle(this.angle - 90, 150)
+			const velocity = this.scene.physics.velocityFromAngle(this.angle - 90, this.speed)
 			this.setVelocity(velocity.x, velocity.y)
 		}
 		if (this.controls.up.isDown || this.controls.W.isDown) {
-			const velocity = this.scene.physics.velocityFromAngle(this.angle - 90 + 180, 150)
+			const velocity = this.scene.physics.velocityFromAngle(this.angle - 90 + 180, this.speed)
 			this.setVelocity(velocity.x, velocity.y)
 		}
 		if (Input.Keyboard.JustDown(this.controls.J)) {
 			this.fire()
 		}
-
 
 		if (this.sparkShot) {
 			const tips = this.getTipTank(36)
@@ -106,6 +115,10 @@ export class Tank extends Physics.Arcade.Sprite {
 		this.sparkShot = this.scene.add.sprite(tips[0], tips[1], 'spark')
 		this.sparkShot.angle = this.angle
 		this.sparkShot.depth = 31
+	}
+
+	slowDown(onOil: boolean) {
+		this.isSlow = onOil
 	}
 
 	fire() {

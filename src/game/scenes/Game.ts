@@ -8,6 +8,7 @@ import { Oil } from '../objects/Oil';
 export class Game extends Scene {
 	tank: Tank
 	oils: Oil[] = []
+	barrelGroup: Phaser.Physics.Arcade.Group
 
 	constructor() {
 		super('Game');
@@ -81,7 +82,6 @@ export class Game extends Scene {
 			[blocksHardTileset]
 		)
 
-
 		backgroundLayer.depth = 0
 		blocksLayer.depth = 10
 		blocksHardLayer.depth = 10
@@ -98,13 +98,13 @@ export class Game extends Scene {
 		const randomPos = Barrel.generateRandomPositions(map.width, map.height, 10, blocksLayer, blocksHardLayer)
 		const barrels = Barrel.generateRandomBarrels(this, randomPos, map)
 
-		const barrelGroup = this.physics.add.group()
+		this.barrelGroup = this.physics.add.group()
 
 		for (let i = 0; i < barrels.length; i++) {
-			barrelGroup.add(barrels[i])
+			this.barrelGroup.add(barrels[i])
 		}
 
-		barrelGroup.children.forEach((child) => {
+		this.barrelGroup.children.forEach((child) => {
 			(child as Barrel).setImmovable(true)
 			this.physics.add.collider(child, this.tank)
 		})
@@ -140,7 +140,7 @@ export class Game extends Scene {
 				})
 			this.physics.add.collider(
 				projectile,
-				barrelGroup,
+				this.barrelGroup,
 				(p, b) => {
 					const proj = p as Projectile
 					const barrel = b as Barrel
@@ -162,6 +162,13 @@ export class Game extends Scene {
 	}
 
 	update() {
+		let onOil = false
 
+		for (let i = 0; i < this.oils.length; i++) {
+			this.physics.world.overlap(this.tank, this.oils[i], () => {
+				onOil = true
+			})
+		}
+		this.tank.slowDown(onOil)
 	}
 }
