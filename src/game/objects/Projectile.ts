@@ -1,13 +1,18 @@
 import { Physics, Scene } from "phaser";
+import { Color } from "./Tank";
 
 export class Projectile extends Physics.Arcade.Sprite {
 
 	static preload(scene: Scene) {
-		scene.load.image('projectile', 'sprites/bulletBlue1_outline.png')
+		scene.load.image(`projectile_${Color.blue}`, 'sprites/bulletBlue1_outline.png')
+		scene.load.image(`projectile_${Color.red}`, 'sprites/bulletRed1_outline.png')
+		scene.load.image(`projectile_${Color.green}`, 'sprites/bulletGreen1_outline.png')
+		scene.load.image(`projectile_${Color.sand}`, 'sprites/bulletSand1_outline.png')
+		scene.load.image(`projectile_${Color.dark}`, 'sprites/bulletDark1_outline.png')
 	}
 
-	constructor(scene: Scene, x: number, y: number, angle: number) {
-		super(scene, x, y, 'projectile')
+	constructor(scene: Scene, x: number, y: number, angle: number, color: Color) {
+		super(scene, x, y, `projectile_${color}`)
 
 		scene.add.existing(this)
 		scene.physics.add.existing(this)

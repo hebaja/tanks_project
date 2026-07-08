@@ -1,5 +1,5 @@
 import { Scene } from 'phaser';
-import { Tank } from '../objects/Tank';
+import { Tank, Color } from '../objects/Tank';
 import { Projectile } from '../objects/Projectile';
 import { ExplosionManager } from '../managers/ExplosionManager';
 import { Barrel } from '../objects/Barrel';
@@ -86,7 +86,7 @@ export class Game extends Scene {
 		blocksLayer.depth = 10
 		blocksHardLayer.depth = 10
 
-		this.tank = new Tank(this)
+		this.tank = new Tank(this, Color.sand)
 
 		this.tank.depth = 30
 		blocksLayer.setCollisionByExclusion([-1]);
@@ -167,7 +167,6 @@ export class Game extends Scene {
 		for (let i = 0; i < this.oils.length; i++) {
 			this.physics.world.overlap(this.tank, this.oils[i], () => {
 				onOil = true
-				console.log('touching')
 			})
 		}
 		this.tank.slowDown(onOil)

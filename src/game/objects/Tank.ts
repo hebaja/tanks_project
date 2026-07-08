@@ -14,6 +14,14 @@ type TankControls = {
 	J: Input.Keyboard.Key;
 }
 
+export enum Color {
+	blue = 'blue',
+	red = 'red',
+	green = 'green',
+	sand = 'sand',
+	dark = 'dark'
+}
+
 type Pair = [x: number, y: number];
 
 export class Tank extends Physics.Arcade.Sprite {
@@ -25,14 +33,19 @@ export class Tank extends Physics.Arcade.Sprite {
 	private speed: number = 150
 	private turnSpeed: number = 2
 	private isSlow: boolean = false
+	private color: Color
 
 	static preload(scene: Scene) {
-		scene.load.image('tank', 'sprites/tank_blue.png')
+		scene.load.image(Color.blue, 'sprites/tank_blue.png')
+		scene.load.image(Color.red, 'sprites/tank_red.png')
+		scene.load.image(Color.green, 'sprites/tank_green.png')
+		scene.load.image(Color.sand, 'sprites/tank_sand.png')
+		scene.load.image(Color.dark, 'sprites/tank_dark.png')
 		scene.load.image('spark', 'sprites/shotOrange.png')
 	}
 
-	constructor(scene: Scene) {
-		super(scene, 25, 25, 'tank')
+	constructor(scene: Scene, color: Color) {
+		super(scene, 25, 25, color)
 		this.keyboard = scene.input.keyboard
 		if (!this.keyboard) {
 			throw new Error('Keyboard plugin not available')
@@ -42,6 +55,7 @@ export class Tank extends Physics.Arcade.Sprite {
 		scene.events.on(Scenes.Events.UPDATE, this.update, this);
 		this.setCollideWorldBounds(true)
 		this.mainScene = scene
+		this.color = color
 
 		this.controls = this.keyboard?.addKeys({
 			left: Input.Keyboard.KeyCodes.LEFT,
@@ -134,7 +148,7 @@ export class Tank extends Physics.Arcade.Sprite {
 			this.sparkShot = undefined
 		})
 
-		this.projectile = new Projectile(this.mainScene, tip[0], tip[1], this.angle)
+		this.projectile = new Projectile(this.mainScene, tip[0], tip[1], this.angle, this.color)
 		this.projectile.depth = 5
 
 		this.mainScene.events.emit('projectileFired', this.projectile)
