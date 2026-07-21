@@ -9,6 +9,7 @@ export class Game extends Scene {
 	tanks: Tank[] = []
 	oils: Oil[] = []
 	barrelGroup: Phaser.Physics.Arcade.Group
+	tankGroup: Phaser.Physics.Arcade.Group 
 
 	constructor() {
 		super('Game');
@@ -88,21 +89,39 @@ export class Game extends Scene {
 		blocksLayer.depth = 10
 		blocksHardLayer.depth = 10
 
-		const tankGroup = this.physics.add.group()
-		this.tanks.push(new Tank(this, 25, 25, Color.blue, 0))
-		this.tanks.push(new Tank(this, 925, 925, Color.red, 1))
+		this.tankGroup = this.physics.add.group()
+
+
+		// this.tanks.push(new Tank(this, 25, 25, Color.blue, 0))
+		// this.tanks.push(new Tank(this, 925, 925, Color.red, 1))
+		
+		// const tankA = new Tank(this, 25, 25, Color.blue, 0)
+
+		this.tankGroup.add(new Tank(this, 25, 25, Color.blue, 0))
+		this.tankGroup.add(new Tank(this, 925, 925, Color.red, 1))
+
 
 		blocksLayer.setCollisionByExclusion([-1]);
 		blocksHardLayer.setCollisionByExclusion([-1]);
 
-		this.tanks.forEach(tank => {
+		this.physics.add.collider(this.tankGroup, blocksLayer)
+		this.physics.add.collider(this.tankGroup, blocksHardLayer)
+		// this.tankGroup
+		//
+		this.tankGroup.getChildren().forEach(t => {
+			const tank = t as Tank
 			tank.depth = 30
-			tankGroup.add(tank)
 			tank.setCollideWorldBounds(true)
-			this.physics.add.collider(tank, blocksLayer)
-			this.physics.add.collider(tank, blocksHardLayer)
 		})
-		this.physics.add.collider(tankGroup, tankGroup)
+
+		// this.tanks.forEach(tank => {
+		// 	tank.depth = 30
+		// 	tank.setCollideWorldBounds(true)
+		// 	this.physics.add.collider(tank, blocksLayer)
+		// 	this.physics.add.collider(tank, blocksHardLayer)
+		// })
+
+		this.physics.add.collider(this.tankGroup, this.tankGroup)
 		const randomPos = Barrel.generateRandomPositions(map.width, map.height, 10, blocksLayer, blocksHardLayer)
 		const barrels = Barrel.generateRandomBarrels(this, randomPos, map)
 
@@ -114,8 +133,9 @@ export class Game extends Scene {
 
 		this.barrelGroup.children.forEach((child) => {
 			(child as Barrel).setImmovable(true)
-			this.tanks.forEach(tank => this.physics.add.collider(child, tank))
 		})
+
+		this.physics.add.collider(this.tankGroup, this.barrelGroup)
 
 		this.events.on('projectileFired', (projectile: Projectile) => {
 			this.physics.add.collider(
@@ -173,10 +193,10 @@ export class Game extends Scene {
 		let onOil = false
 
 		for (let i = 0; i < this.oils.length; i++) {
-			this.tanks.forEach(tank => {
+			this.tankGroup.getChildren().forEach(tank => {
 				this.physics.world.overlap(tank, this.oils[i], () => onOil = true )
 			})
 		}
-		this.tanks.forEach(tank => tank.slowDown(onOil))
+		this.tankGroup.getChildren().forEach(tank => (tank as Tank).slowDown(onOil))
 	}
 }
