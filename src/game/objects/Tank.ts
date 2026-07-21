@@ -104,7 +104,7 @@ export class Tank extends Physics.Arcade.Sprite {
 			this.speed = 150
 		}
 
-		if (this.playerIndex == 0)
+		if (this.playerIndex == 0 && this.body)
 		{
 			if (this.controlsA.A.isDown) {
 				this.angle -= this.turnSpeed
@@ -125,7 +125,7 @@ export class Tank extends Physics.Arcade.Sprite {
 			}
 		}
 
-		if (this.playerIndex == 1)
+		if (this.playerIndex == 1 && this.body)
 		{
 			if (this.controlsB.left.isDown) {
 				this.angle -= this.turnSpeed
