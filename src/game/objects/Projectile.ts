@@ -11,11 +11,13 @@ export class Projectile extends Physics.Arcade.Sprite {
 		scene.load.image(`projectile_${Color.dark}`, 'sprites/bulletDark1_outline.png')
 	}
 
-	constructor(scene: Scene, x: number, y: number, angle: number, color: Color) {
+	constructor(scene: Scene, x: number, y: number, angle: number, color: Color, group: Phaser.Physics.Arcade.Group) {
 		super(scene, x, y, `projectile_${color}`)
 
 		scene.add.existing(this)
 		scene.physics.add.existing(this)
+
+		group.add(this)
 
 		this.setCollideWorldBounds(true, 0, 0, true)
 		this.scene.physics.world.on('worldbounds', (body: Physics.Arcade.Body) => {

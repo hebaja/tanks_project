@@ -9,7 +9,8 @@ export class Game extends Scene {
 	tanks: Tank[] = []
 	oils: Oil[] = []
 	barrelGroup: Phaser.Physics.Arcade.Group
-	tankGroup: Phaser.Physics.Arcade.Group 
+	tankGroup: Phaser.Physics.Arcade.Group
+	projectileGroup: Phaser.Physics.Arcade.Group
 
 	constructor() {
 		super('Game');
@@ -90,7 +91,7 @@ export class Game extends Scene {
 		blocksHardLayer.depth = 10
 
 		this.tankGroup = this.physics.add.group()
-
+		this.projectileGroup = this.physics.add.group()
 
 		// this.tanks.push(new Tank(this, 25, 25, Color.blue, 0))
 		// this.tanks.push(new Tank(this, 925, 925, Color.red, 1))
@@ -138,6 +139,9 @@ export class Game extends Scene {
 		this.physics.add.collider(this.tankGroup, this.barrelGroup)
 
 		this.events.on('projectileFired', (projectile: Projectile) => {
+
+			// this.projectileGroup.add(projectile)
+
 			this.physics.add.collider(
 				projectile,
 				blocksLayer,
@@ -203,6 +207,24 @@ export class Game extends Scene {
 
 					proj.destroy()
 					tank.destroy()
+				})
+			this.physics.add.collider(
+				this.projectileGroup,
+				this.projectileGroup,
+				(p1, p2) => {
+					const proj1 = p1 as Projectile
+					const proj2 = p2 as Projectile
+
+					if (!proj1.active || !proj2.active) return
+
+					this.events.emit("explosion", {
+						x: (proj1.x + proj2.x) / 2,
+						y: (proj1.y + proj2.y) / 2,
+						type: "explosion"
+					})
+
+					proj1.destroy()
+					proj2.destroy()
 				})
 		})
 	}
