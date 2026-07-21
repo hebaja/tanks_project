@@ -91,8 +91,8 @@ export class Tank extends Physics.Arcade.Sprite {
 	}
 
 	update() {
-
-		this.setVelocity(0, 0)
+		if (this.body)
+			this.setVelocity(0, 0)
 		if (this.isSlow) {
 			this.turnSpeed = 1
 			this.speed = 50
@@ -168,6 +168,10 @@ export class Tank extends Physics.Arcade.Sprite {
 				tips[1]
 			);
 		}
+	}
+
+	getProjectile(): Projectile | null {
+		return this.projectile
 	}
 
 	getTipTank(distance: number): Pair {

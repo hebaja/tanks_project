@@ -186,6 +186,24 @@ export class Game extends Scene {
 						this.oils.push(new Oil(this, barrelX, barrelY))
 					})
 				})
+			this.physics.add.collider(
+				projectile,
+				this.tankGroup,
+				(p, t) => {
+					const proj = p as Projectile
+					const tank = t as Tank
+
+					if (tank.getProjectile() === proj) return
+
+					this.events.emit("explosion", {
+						x: tank.x,
+						y: tank.y,
+						type: "explosion"
+					})
+
+					proj.destroy()
+					tank.destroy()
+				})
 		})
 	}
 
