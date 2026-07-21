@@ -91,7 +91,6 @@ export class Game extends Scene {
 		const tankGroup = this.physics.add.group()
 		this.tanks.push(new Tank(this, 25, 25, Color.blue, 0))
 		this.tanks.push(new Tank(this, 925, 925, Color.red, 1))
-		// this.tank = new Tank(this, 25, 25, Color.blue, 0)
 
 		blocksLayer.setCollisionByExclusion([-1]);
 		blocksHardLayer.setCollisionByExclusion([-1]);
@@ -99,16 +98,11 @@ export class Game extends Scene {
 		this.tanks.forEach(tank => {
 			tank.depth = 30
 			tankGroup.add(tank)
-			this.physics.add.collider(tank, blocksLayer);
-			this.physics.add.collider(tank, blocksHardLayer);
+			tank.setCollideWorldBounds(true)
+			this.physics.add.collider(tank, blocksLayer)
+			this.physics.add.collider(tank, blocksHardLayer)
 		})
 		this.physics.add.collider(tankGroup, tankGroup)
-
-
-
-		// this.physics.add.collider(this.tank, blocksLayer);
-		// this.physics.add.collider(this.tank, blocksHardLayer);
-
 		const randomPos = Barrel.generateRandomPositions(map.width, map.height, 10, blocksLayer, blocksHardLayer)
 		const barrels = Barrel.generateRandomBarrels(this, randomPos, map)
 
@@ -120,7 +114,6 @@ export class Game extends Scene {
 
 		this.barrelGroup.children.forEach((child) => {
 			(child as Barrel).setImmovable(true)
-			// this.physics.add.collider(child, this.tank)
 			this.tanks.forEach(tank => this.physics.add.collider(child, tank))
 		})
 

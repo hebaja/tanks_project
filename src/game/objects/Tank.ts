@@ -59,7 +59,6 @@ export class Tank extends Physics.Arcade.Sprite {
 		scene.physics.add.existing(this)
 		scene.add.existing(this)
 		scene.events.on(Scenes.Events.UPDATE, this.update, this);
-		this.setCollideWorldBounds(true)
 		this.mainScene = scene
 		this.color = color
 		this.playerIndex = index
