@@ -92,56 +92,28 @@ export class Game extends Scene {
 
 		this.tankGroup = this.physics.add.group()
 		this.projectileGroup = this.physics.add.group()
+		this.barrelGroup = this.physics.add.group()
 
-		// this.tanks.push(new Tank(this, 25, 25, Color.blue, 0))
-		// this.tanks.push(new Tank(this, 925, 925, Color.red, 1))
-		
-		// const tankA = new Tank(this, 25, 25, Color.blue, 0)
-
-		this.tankGroup.add(new Tank(this, 25, 25, Color.blue, 0))
-		this.tankGroup.add(new Tank(this, 925, 925, Color.red, 1))
-
+		new Tank(this, 25, 25, Color.blue, 0, this.tankGroup)
+		new Tank(this, 925, 925, Color.red, 1, this.tankGroup)
 
 		blocksLayer.setCollisionByExclusion([-1]);
 		blocksHardLayer.setCollisionByExclusion([-1]);
 
 		this.physics.add.collider(this.tankGroup, blocksLayer)
 		this.physics.add.collider(this.tankGroup, blocksHardLayer)
-		// this.tankGroup
-		//
-		this.tankGroup.getChildren().forEach(t => {
-			const tank = t as Tank
-			tank.depth = 30
-			tank.setCollideWorldBounds(true)
-		})
-
-		// this.tanks.forEach(tank => {
-		// 	tank.depth = 30
-		// 	tank.setCollideWorldBounds(true)
-		// 	this.physics.add.collider(tank, blocksLayer)
-		// 	this.physics.add.collider(tank, blocksHardLayer)
-		// })
 
 		this.physics.add.collider(this.tankGroup, this.tankGroup)
 		const randomPos = Barrel.generateRandomPositions(map.width, map.height, 10, blocksLayer, blocksHardLayer)
 		const barrels = Barrel.generateRandomBarrels(this, randomPos, map)
 
-		this.barrelGroup = this.physics.add.group()
+		for (let i = 0; i < barrels.length; i++) this.barrelGroup.add(barrels[i])
 
-		for (let i = 0; i < barrels.length; i++) {
-			this.barrelGroup.add(barrels[i])
-		}
-
-		this.barrelGroup.children.forEach((child) => {
-			(child as Barrel).setImmovable(true)
-		})
+		this.barrelGroup.children.forEach((child) => (child as Barrel).setImmovable(true))
 
 		this.physics.add.collider(this.tankGroup, this.barrelGroup)
 
 		this.events.on('projectileFired', (projectile: Projectile) => {
-
-			// this.projectileGroup.add(projectile)
-
 			this.physics.add.collider(
 				projectile,
 				blocksLayer,

@@ -38,5 +38,4 @@ export class Projectile extends Physics.Arcade.Sprite {
 	update() {
 
 	}
-
 }

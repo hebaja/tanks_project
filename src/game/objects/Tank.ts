@@ -50,7 +50,7 @@ export class Tank extends Physics.Arcade.Sprite {
 		scene.load.image('spark', 'sprites/shotOrange.png')
 	}
 
-	constructor(scene: Scene, x: number, y: number, color: Color, index: number) {
+	constructor(scene: Scene, x: number, y: number, color: Color, index: number, group: Phaser.Physics.Arcade.Group) {
 		super(scene, x, y, color)
 		this.keyboard = scene.input.keyboard
 		if (!this.keyboard) {
@@ -58,7 +58,10 @@ export class Tank extends Physics.Arcade.Sprite {
 		}
 		scene.physics.add.existing(this)
 		scene.add.existing(this)
+		group.add(this)
 		scene.events.on(Scenes.Events.UPDATE, this.update, this);
+		this.setCollideWorldBounds(true)
+		this.depth = 30
 		this.mainScene = scene
 		this.color = color
 		this.playerIndex = index
