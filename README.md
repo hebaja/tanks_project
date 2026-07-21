@@ -12,7 +12,7 @@ This template has been updated for:
 - [Vite 6.3.1](https://github.com/vitejs/vite)
 - [TypeScript 5.7.2](https://github.com/microsoft/TypeScript)
 
-![screenshot](<img width="1858" height="1852" alt="Screenshot From 2026-07-21 01-51-56" src="https://github.com/user-attachments/assets/309fbb06-7bb1-421a-a59f-3053e2300f56" />)
+<img width="1858" height="1852" alt="Screenshot From 2026-07-21 01-51-56" src="https://github.com/user-attachments/assets/309fbb06-7bb1-421a-a59f-3053e2300f56" />
 
 ## Requirements
 
