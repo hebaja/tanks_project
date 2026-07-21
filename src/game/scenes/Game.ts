@@ -202,13 +202,12 @@ export class Game extends Scene {
 	}
 
 	update() {
-		let onOil = false
+    this.tankGroup.getChildren().forEach(tank => {
+      let onOil = false
 
-		for (let i = 0; i < this.oils.length; i++) {
-			this.tankGroup.getChildren().forEach(tank => {
-				this.physics.world.overlap(tank, this.oils[i], () => onOil = true )
-			})
-		}
-		this.tankGroup.getChildren().forEach(tank => (tank as Tank).slowDown(onOil))
+      for (let i = 0; i < this.oils.length; i++)
+        this.physics.world.overlap(tank, this.oils[i], () => onOil = true )
+      tank.slowDown(onOil)
+    })
 	}
 }
