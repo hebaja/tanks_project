@@ -2,16 +2,20 @@ import { Physics, Input, Scenes, Scene } from 'phaser'
 import { Math as PhaserMath } from 'phaser'
 import { Projectile } from './Projectile'
 
-type TankControls = {
-	left: Input.Keyboard.Key;
-	right: Input.Keyboard.Key;
-	up: Input.Keyboard.Key;
-	down: Input.Keyboard.Key;
+type TankControlsA = {
 	A: Input.Keyboard.Key;
 	D: Input.Keyboard.Key;
 	W: Input.Keyboard.Key;
 	S: Input.Keyboard.Key;
 	J: Input.Keyboard.Key;
+}
+
+type TankControlsB = {
+	left: Input.Keyboard.Key;
+	right: Input.Keyboard.Key;
+	up: Input.Keyboard.Key;
+	down: Input.Keyboard.Key;
+	enter: Input.Keyboard.Key;
 }
 
 export enum Color {
@@ -25,7 +29,8 @@ export enum Color {
 type Pair = [x: number, y: number];
 
 export class Tank extends Physics.Arcade.Sprite {
-	private controls: TankControls
+	private controlsA: TankControlsA
+	private controlsB: TankControlsB
 	private keyboard: any
 	private mainScene: Scene
 	private projectile: Projectile | null = null
@@ -34,6 +39,7 @@ export class Tank extends Physics.Arcade.Sprite {
 	private turnSpeed: number = 2
 	private isSlow: boolean = false
 	private color: Color
+	private playerIndex: number
 
 	static preload(scene: Scene) {
 		scene.load.image(Color.blue, 'sprites/tank_blue.png')
@@ -44,8 +50,8 @@ export class Tank extends Physics.Arcade.Sprite {
 		scene.load.image('spark', 'sprites/shotOrange.png')
 	}
 
-	constructor(scene: Scene, color: Color) {
-		super(scene, 25, 25, color)
+	constructor(scene: Scene, x: number, y: number, color: Color, index: number) {
+		super(scene, x, y, color)
 		this.keyboard = scene.input.keyboard
 		if (!this.keyboard) {
 			throw new Error('Keyboard plugin not available')
@@ -56,19 +62,28 @@ export class Tank extends Physics.Arcade.Sprite {
 		this.setCollideWorldBounds(true)
 		this.mainScene = scene
 		this.color = color
+		this.playerIndex = index
 
-		this.controls = this.keyboard?.addKeys({
-			left: Input.Keyboard.KeyCodes.LEFT,
-			right: Input.Keyboard.KeyCodes.RIGHT,
-			up: Input.Keyboard.KeyCodes.UP,
-			down: Input.Keyboard.KeyCodes.DOWN,
-			A: Input.Keyboard.KeyCodes.A,
-			D: Input.Keyboard.KeyCodes.D,
-			W: Input.Keyboard.KeyCodes.W,
-			S: Input.Keyboard.KeyCodes.S,
-			J: Input.Keyboard.KeyCodes.J
-		})
-		this.angle = 0
+		if (this.playerIndex == 0)
+			this.controlsA = this.keyboard?.addKeys({
+				A: Input.Keyboard.KeyCodes.A,
+				D: Input.Keyboard.KeyCodes.D,
+				W: Input.Keyboard.KeyCodes.W,
+				S: Input.Keyboard.KeyCodes.S,
+				J: Input.Keyboard.KeyCodes.J
+			})
+		if (this.playerIndex == 1)
+			this.controlsB = this.keyboard?.addKeys({
+				left: Input.Keyboard.KeyCodes.LEFT,
+				right: Input.Keyboard.KeyCodes.RIGHT,
+				up: Input.Keyboard.KeyCodes.UP,
+				down: Input.Keyboard.KeyCodes.DOWN,
+				enter: Input.Keyboard.KeyCodes.ENTER
+			})
+		if (this.playerIndex == 0)
+			this.angle = 0
+		if (this.playerIndex == 1)
+			this.angle = 180
 	}
 
 	destroy(fromScene?: boolean): void {
@@ -87,23 +102,65 @@ export class Tank extends Physics.Arcade.Sprite {
 			this.speed = 150
 		}
 
-		if (this.controls.left.isDown || this.controls.A.isDown) {
-			this.angle -= this.turnSpeed
+		if (this.playerIndex == 0)
+		{
+			if (this.controlsA.A.isDown) {
+				this.angle -= this.turnSpeed
+			}
+			if (this.controlsA.D.isDown) {
+				this.angle += this.turnSpeed
+			}
+			if (this.controlsA.S.isDown) {
+				const velocity = this.scene.physics.velocityFromAngle(this.angle - 90, this.speed)
+				this.setVelocity(velocity.x, velocity.y)
+			}
+			if (this.controlsA.W.isDown) {
+				const velocity = this.scene.physics.velocityFromAngle(this.angle - 90 + 180, this.speed)
+				this.setVelocity(velocity.x, velocity.y)
+			}
+			if (Input.Keyboard.JustDown(this.controlsA.J)) {
+				this.fire()
+			}
 		}
-		if (this.controls.right.isDown || this.controls.D.isDown) {
-			this.angle += this.turnSpeed
+
+		if (this.playerIndex == 1)
+		{
+			if (this.controlsB.left.isDown) {
+				this.angle -= this.turnSpeed
+			}
+			if (this.controlsB.right.isDown) {
+				this.angle += this.turnSpeed
+			}
+			if (this.controlsB.down.isDown) {
+				const velocity = this.scene.physics.velocityFromAngle(this.angle - 90, this.speed)
+				this.setVelocity(velocity.x, velocity.y)
+			}
+			if (this.controlsB.up.isDown) {
+				const velocity = this.scene.physics.velocityFromAngle(this.angle - 90 + 180, this.speed)
+				this.setVelocity(velocity.x, velocity.y)
+			}
+			if (Input.Keyboard.JustDown(this.controlsB.enter)) {
+				this.fire()
+			}
 		}
-		if (this.controls.down.isDown || this.controls.S.isDown) {
-			const velocity = this.scene.physics.velocityFromAngle(this.angle - 90, this.speed)
-			this.setVelocity(velocity.x, velocity.y)
-		}
-		if (this.controls.up.isDown || this.controls.W.isDown) {
-			const velocity = this.scene.physics.velocityFromAngle(this.angle - 90 + 180, this.speed)
-			this.setVelocity(velocity.x, velocity.y)
-		}
-		if (Input.Keyboard.JustDown(this.controls.J)) {
-			this.fire()
-		}
+
+		// if (this.controls.left.isDown || this.controls.A.isDown) {
+		// 	this.angle -= this.turnSpeed
+		// }
+		// if (this.controls.right.isDown || this.controls.D.isDown) {
+		// 	this.angle += this.turnSpeed
+		// }
+		// if (this.controls.down.isDown || this.controls.S.isDown) {
+		// 	const velocity = this.scene.physics.velocityFromAngle(this.angle - 90, this.speed)
+		// 	this.setVelocity(velocity.x, velocity.y)
+		// }
+		// if (this.controls.up.isDown || this.controls.W.isDown) {
+		// 	const velocity = this.scene.physics.velocityFromAngle(this.angle - 90 + 180, this.speed)
+		// 	this.setVelocity(velocity.x, velocity.y)
+		// }
+		// if (Input.Keyboard.JustDown(this.controls.J)) {
+		// 	this.fire()
+		// }
 
 		if (this.sparkShot) {
 			const tips = this.getTipTank(36)
