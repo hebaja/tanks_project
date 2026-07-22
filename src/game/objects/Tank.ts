@@ -202,10 +202,8 @@ export class Tank extends Physics.Arcade.Sprite {
 		if (this.projectile)
 			return;
 
-		const tip = this.getTipTank(25)
-
+		const tip = this.getTipTank(20)
 		this.setSparkShot()
-
 		this.scene.time.delayedCall(100, () => {
 			this.sparkShot?.destroy()
 			this.sparkShot = undefined
