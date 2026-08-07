@@ -49,6 +49,10 @@ export class Game extends Scene {
 		if (!map)
 			throw new Error('Map could not be initialized')
 
+		const HORIZONTAL_MARGIN = (this.scale.width - map.widthInPixels) / 2
+
+		this.cameras.main.setScroll(-HORIZONTAL_MARGIN, 0)
+
 		this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
 
 		const em = new ExplosionManager(this)
@@ -56,19 +60,19 @@ export class Game extends Scene {
 		const terrainTileset = map.addTilesetImage(
 			'terrain_tileset',
 			'terrain_tileset'
-		);
+		)
 		const cornerTileset = map.addTilesetImage(
 			'corner',
 			'corner'
-		);
+		)
 		const blocksTileset = map.addTilesetImage(
 			'stone',
 			'stone'
-		);
+		)
 		const blocksHardTileset = map.addTilesetImage(
 			'rock',
 			'rock'
-		);
+		)
 
 		if (!terrainTileset || !cornerTileset || !blocksTileset || !blocksHardTileset) {
 			throw new Error("Tileset not found");
@@ -76,7 +80,7 @@ export class Game extends Scene {
 		const backgroundLayer = map.createLayer(
 			"background",
 			[terrainTileset, cornerTileset]
-		);
+		)
 		const blocksLayer = map.createLayer(
 			"blocks",
 			[blocksTileset]
@@ -202,8 +206,9 @@ export class Game extends Scene {
 	}
 
 	update() {
-    this.tankGroup.getChildren().forEach(tank => {
+    this.tankGroup.getChildren().forEach(t => {
       let onOil = false
+	  const tank : Tank = t as Tank
 
       for (let i = 0; i < this.oils.length; i++)
         this.physics.world.overlap(tank, this.oils[i], () => onOil = true )
