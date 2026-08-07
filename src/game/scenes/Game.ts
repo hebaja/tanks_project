@@ -59,23 +59,7 @@ export class Game extends Scene {
 
 		this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
 
-		//this.add.rectangle(-32, 50, 32, 32, 0xff0000).setDepth(100)		
-		// this.add.rectangle(map.widthInPixels + 32, 100, 32, 32, 0xffff00).setDepth(100)		
-		
-		// const barW = 200, inset = 2
-		// const bg = scene.add.nineslice(-HORIZONTAL_MARGIN + 160, 50, 'panel', undefined, 100, 30, 6, 6, 6, 6).setDepth(100)
-		// const fill = scene.add.nineslice(-HORIZONTAL_MARGIN + 160 - 44, 50, 'fill', undefined, 90, 24, 3, 3, 4, 8).setDepth(90)
-		
 		this.ammoGauge = new AmmoGauge(this, 160, 16, -HORIZONTAL_MARGIN)
-
-		// fill.setSlices(20, 24, 0, 0)
-		// const g = this.add.graphics({x: -50, y: 50})
-		// g.fillStyle(0xff0000)
-		// g.fillRect(0, 0, 32, 32)
-		// g.setDepth(100)
-
-
-		// const bar = this.add.nineslice(150, 150, 'ui')
 
 		const em = new ExplosionManager(this)
 
