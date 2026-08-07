@@ -51,9 +51,19 @@ export class Game extends Scene {
 
 		const HORIZONTAL_MARGIN = (this.scale.width - map.widthInPixels) / 2
 
+		console.log(HORIZONTAL_MARGIN)
+		console.log(map.widthInPixels)
+		console.log(map.widthInPixels - HORIZONTAL_MARGIN)
+
 		this.cameras.main.setScroll(-HORIZONTAL_MARGIN, 0)
 
 		this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
+
+		this.add.rectangle(-32, 50, 32, 32, 0xff0000).setDepth(100)		
+		this.add.rectangle(map.widthInPixels + 32, 100, 32, 32, 0xffff00).setDepth(100)		
+
+
+		// const bar = this.add.nineslice(150, 150, 'ui')
 
 		const em = new ExplosionManager(this)
 
