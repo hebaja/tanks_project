@@ -1,9 +1,10 @@
-import { Scene } from 'phaser';
+import { Display, Scene } from 'phaser';
 import { Tank, Color } from '../objects/Tank';
 import { Projectile } from '../objects/Projectile';
 import { ExplosionManager } from '../managers/ExplosionManager';
 import { Barrel } from '../objects/Barrel';
 import { Oil } from '../objects/Oil';
+import { AmmoGauge } from '../objects/AmmoGauge';
 
 export class Game extends Scene {
 	tanks: Tank[] = []
@@ -11,6 +12,7 @@ export class Game extends Scene {
 	barrelGroup: Phaser.Physics.Arcade.Group
 	tankGroup: Phaser.Physics.Arcade.Group
 	projectileGroup: Phaser.Physics.Arcade.Group
+	ammoGauge: AmmoGauge
 
 	constructor() {
 		super('Game');
@@ -36,11 +38,13 @@ export class Game extends Scene {
 			'map/rock.png'
 		);
 
+
 		Tank.preload(this)
 		Projectile.preload(this)
 		ExplosionManager.preload(this)
 		Barrel.preload(this)
 		Oil.preload(this)
+		AmmoGauge.preload(this)
 	}
 
 	create() {
@@ -51,16 +55,24 @@ export class Game extends Scene {
 
 		const HORIZONTAL_MARGIN = (this.scale.width - map.widthInPixels) / 2
 
-		console.log(HORIZONTAL_MARGIN)
-		console.log(map.widthInPixels)
-		console.log(map.widthInPixels - HORIZONTAL_MARGIN)
-
 		this.cameras.main.setScroll(-HORIZONTAL_MARGIN, 0)
 
 		this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
 
-		this.add.rectangle(-32, 50, 32, 32, 0xff0000).setDepth(100)		
-		this.add.rectangle(map.widthInPixels + 32, 100, 32, 32, 0xffff00).setDepth(100)		
+		//this.add.rectangle(-32, 50, 32, 32, 0xff0000).setDepth(100)		
+		// this.add.rectangle(map.widthInPixels + 32, 100, 32, 32, 0xffff00).setDepth(100)		
+		
+		// const barW = 200, inset = 2
+		// const bg = scene.add.nineslice(-HORIZONTAL_MARGIN + 160, 50, 'panel', undefined, 100, 30, 6, 6, 6, 6).setDepth(100)
+		// const fill = scene.add.nineslice(-HORIZONTAL_MARGIN + 160 - 44, 50, 'fill', undefined, 90, 24, 3, 3, 4, 8).setDepth(90)
+		
+		this.ammoGauge = new AmmoGauge(this, 160, 16, -HORIZONTAL_MARGIN)
+
+		// fill.setSlices(20, 24, 0, 0)
+		// const g = this.add.graphics({x: -50, y: 50})
+		// g.fillStyle(0xff0000)
+		// g.fillRect(0, 0, 32, 32)
+		// g.setDepth(100)
 
 
 		// const bar = this.add.nineslice(150, 150, 'ui')
@@ -128,6 +140,11 @@ export class Game extends Scene {
 		this.physics.add.collider(this.tankGroup, this.barrelGroup)
 
 		this.events.on('projectileFired', (projectile: Projectile) => {
+		
+			// this.fill.setSlices(50, 24, 3, 3, 4, 8)
+			this.ammoGauge.consumeGauge()
+
+
 			this.physics.add.collider(
 				projectile,
 				blocksLayer,
@@ -216,13 +233,13 @@ export class Game extends Scene {
 	}
 
 	update() {
-    this.tankGroup.getChildren().forEach(t => {
-      let onOil = false
-	  const tank : Tank = t as Tank
+		this.tankGroup.getChildren().forEach(t => {
+		let onOil = false
+		const tank : Tank = t as Tank
 
-      for (let i = 0; i < this.oils.length; i++)
-        this.physics.world.overlap(tank, this.oils[i], () => onOil = true )
-      tank.slowDown(onOil)
-    })
+		for (let i = 0; i < this.oils.length; i++)
+			this.physics.world.overlap(tank, this.oils[i], () => onOil = true )
+		tank.slowDown(onOil)
+		})
 	}
 }

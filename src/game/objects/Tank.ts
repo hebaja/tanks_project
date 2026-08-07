@@ -146,24 +146,6 @@ export class Tank extends Physics.Arcade.Sprite {
 			}
 		}
 
-		// if (this.controls.left.isDown || this.controls.A.isDown) {
-		// 	this.angle -= this.turnSpeed
-		// }
-		// if (this.controls.right.isDown || this.controls.D.isDown) {
-		// 	this.angle += this.turnSpeed
-		// }
-		// if (this.controls.down.isDown || this.controls.S.isDown) {
-		// 	const velocity = this.scene.physics.velocityFromAngle(this.angle - 90, this.speed)
-		// 	this.setVelocity(velocity.x, velocity.y)
-		// }
-		// if (this.controls.up.isDown || this.controls.W.isDown) {
-		// 	const velocity = this.scene.physics.velocityFromAngle(this.angle - 90 + 180, this.speed)
-		// 	this.setVelocity(velocity.x, velocity.y)
-		// }
-		// if (Input.Keyboard.JustDown(this.controls.J)) {
-		// 	this.fire()
-		// }
-
 		if (this.sparkShot) {
 			const tips = this.getTipTank(36)
 			this.sparkShot.setPosition(
