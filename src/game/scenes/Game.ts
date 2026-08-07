@@ -24,19 +24,20 @@ export class Game extends Scene {
 		this.load.image(
 			'terrain_tileset',
 			'map/terrainTiles_default.png'
-		);
+		)
 		this.load.image(
 			'corner',
 			'map/corner.png'
-		);
+		)
 		this.load.image(
 			'stone',
 			'map/stone.png'
-		);
+		)
 		this.load.image(
 			'rock',
 			'map/rock.png'
-		);
+		)
+
 
 
 		Tank.preload(this)
@@ -59,7 +60,10 @@ export class Game extends Scene {
 
 		this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
 
-		this.ammoGauge = new AmmoGauge(this, 160, 16, -HORIZONTAL_MARGIN)
+		this.ammoGauge = new AmmoGauge(this, 160, 32, -HORIZONTAL_MARGIN)
+
+
+
 
 		const em = new ExplosionManager(this)
 

@@ -1,4 +1,5 @@
 import { Display, GameObjects, Scene, Scenes } from "phaser";
+import { Color } from "./Tank";
 
 export class AmmoGauge extends GameObjects.Container {
 
@@ -10,6 +11,8 @@ export class AmmoGauge extends GameObjects.Container {
 	alarmTween?: Phaser.Tweens.Tween
 	recharging: boolean = false
 	canFire: boolean = true
+	counter: number = 5
+	quantity: Phaser.GameObjects.Text
 
 	static preload(scene: Scene) {
 		scene.load.image(
@@ -20,6 +23,10 @@ export class AmmoGauge extends GameObjects.Container {
 			'fill',
 			'bars/blue_fill.png'
 		)
+		scene.load.font(
+			'PixelifySans-Medium',
+			'fonts/PressStart2P-Regular.ttf'
+		)
 	}
 
 	constructor(scene: Scene, x: number, y: number, HORIZONTAL_MARGIN: number) {
@@ -27,6 +34,16 @@ export class AmmoGauge extends GameObjects.Container {
 
 		this.mainScene = scene
 		const edgeGap = 64
+		
+		this.quantity = scene.add.text(HORIZONTAL_MARGIN - edgeGap - 28, y - 38, `x${this.counter}`, {
+			fontSize: '18px',
+			fontFamily: 'PixelifySans-Medium'
+		}).setDepth(100)
+
+		const color = 'blue'
+
+		scene.add.image(HORIZONTAL_MARGIN + 56, y, `projectile_${color}`).setScale(1.6)
+
 		
 		this.bg = scene.add.rectangle(HORIZONTAL_MARGIN - edgeGap, y, 90, 24, 0x000000).setDepth(0)
 
@@ -36,6 +53,7 @@ export class AmmoGauge extends GameObjects.Container {
 		this.add(this.bg)
 		this.add(this.fill)
 		this.add(frame)
+		this.add(this.quantity)
 		this.setDepth(100)
 
 		scene.add.existing(this)
@@ -48,6 +66,8 @@ export class AmmoGauge extends GameObjects.Container {
 		if (this.gaugeWidth > 0)
 		{
 			this.gaugeWidth -= 18
+			if (this.counter > 0)
+				this.quantity.setText(`x${--this.counter}`)
 			this.mainScene.tweens.add({
 				targets: this.fill,
 				width: this.gaugeWidth,
@@ -64,13 +84,22 @@ export class AmmoGauge extends GameObjects.Container {
 		if (this.alarmTween) this.alarmTween.stop()
 		this.alarmOn = false
 		this.bg.setFillStyle(0x000000)
+
+
+		this.mainScene.events.emit("disable_can_fire")
+
 		this.mainScene.tweens.add({
 			targets: this,
 			gaugeWidth: 90,
 			duration: 5000,
 			ease: 'Sine.easeOut',
 			onUpdate: () => { this.fill.width = this.gaugeWidth },
-		    onComplete: () => { this.recharging = false }
+		    onComplete: () => { 
+				this.recharging = false
+				this.counter = 5
+				this.quantity.setText(`x${this.counter}`)
+				this.mainScene.events.emit("enable_can_fire")
+			}
 		})
 	}
 

@@ -40,6 +40,7 @@ export class Tank extends Physics.Arcade.Sprite {
 	private isSlow: boolean = false
 	private color: Color
 	private playerIndex: number
+	private canFire: boolean = true
 
 	static preload(scene: Scene) {
 		scene.load.image(Color.blue, 'sprites/tank_blue.png')
@@ -86,6 +87,26 @@ export class Tank extends Physics.Arcade.Sprite {
 			this.angle = 0
 		if (this.playerIndex == 1)
 			this.angle = 180
+		
+
+		scene.events.on(
+			"disable_can_fire",
+			this.disableCanFire,
+			this
+		)
+		scene.events.on(
+			"enable_can_fire",
+			this.enableCanFire,
+			this
+		)
+	}
+
+	disableCanFire() {
+		this.canFire = false;
+	}
+
+	enableCanFire() {
+		this.canFire = true
 	}
 
 	destroy(fromScene?: boolean): void {
@@ -181,7 +202,7 @@ export class Tank extends Physics.Arcade.Sprite {
 	}
 
 	fire() {
-		if (this.projectile)
+		if (!this.canFire)
 			return;
 
 		const tip = this.getTipTank(20)
