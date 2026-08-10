@@ -1,5 +1,5 @@
 import { Physics, Scene } from "phaser";
-import { Color } from "./Tank";
+import { Color } from "../config/color.ts";
 
 export class Projectile extends Physics.Arcade.Sprite {
 
@@ -7,7 +7,6 @@ export class Projectile extends Physics.Arcade.Sprite {
 		scene.load.image(`projectile_${Color.blue}`, 'sprites/bulletBlue1_outline.png')
 		scene.load.image(`projectile_${Color.red}`, 'sprites/bulletRed1_outline.png')
 		scene.load.image(`projectile_${Color.green}`, 'sprites/bulletGreen1_outline.png')
-		scene.load.image(`projectile_${Color.sand}`, 'sprites/bulletSand1_outline.png')
 		scene.load.image(`projectile_${Color.dark}`, 'sprites/bulletDark1_outline.png')
 	}
 

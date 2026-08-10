@@ -1,10 +1,11 @@
-import { Display, Scene } from 'phaser';
-import { Tank, Color } from '../objects/Tank';
+import { Scene } from 'phaser';
+import { Tank } from '../objects/Tank';
 import { Projectile } from '../objects/Projectile';
 import { ExplosionManager } from '../managers/ExplosionManager';
 import { Barrel } from '../objects/Barrel';
 import { Oil } from '../objects/Oil';
 import { AmmoGauge } from '../objects/AmmoGauge';
+import { Color } from '../config/color';
 
 export class Game extends Scene {
 	tanks: Tank[] = []
@@ -113,10 +114,10 @@ export class Game extends Scene {
 		// 925, 925, Color.green
 		// 925, 25, Color.dark
 		
-		new Tank(this, 25, 25, Color.blue, Tank.tankIndex++, this.tankGroup, -HORIZONTAL_MARGIN)
-		new Tank(this, 25, 925, Color.red, Tank.tankIndex++, this.tankGroup, -HORIZONTAL_MARGIN)
-		new Tank(this, 925, 925, Color.green, Tank.tankIndex++, this.tankGroup, -HORIZONTAL_MARGIN)
-		new Tank(this, 925, 25, Color.dark, Tank.tankIndex++, this.tankGroup, -HORIZONTAL_MARGIN)
+		new Tank(this, 25, 25, Color.blue, Tank.tankIndex++, this.tankGroup)
+		new Tank(this, 25, 925, Color.red, Tank.tankIndex++, this.tankGroup)
+		new Tank(this, 925, 925, Color.green, Tank.tankIndex++, this.tankGroup)
+		new Tank(this, 925, 25, Color.dark, Tank.tankIndex++, this.tankGroup)
 
 		blocksLayer.setCollisionByExclusion([-1]);
 		blocksHardLayer.setCollisionByExclusion([-1]);

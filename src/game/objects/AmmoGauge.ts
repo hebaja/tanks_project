@@ -1,9 +1,10 @@
 import { Display, GameObjects, Scene, Scenes } from "phaser";
-import { Color } from "./Tank";
+import { Color } from "../config/color.ts";
+import { type Corner, HUD } from "../config/layout.ts";
 
 export class AmmoGauge extends GameObjects.Container {
 
-	gaugeWidth: number = 90
+	gaugeWidth: number = HUD.gaugeWidth
 	mainScene: Scene
 	fill: Phaser.GameObjects.NineSlice
 	bg: Phaser.GameObjects.Rectangle
@@ -11,7 +12,7 @@ export class AmmoGauge extends GameObjects.Container {
 	alarmTween?: Phaser.Tweens.Tween
 	recharging: boolean = false
 	canFire: boolean = true
-	counter: number = 5
+	counter: number = HUD.initialAmmo
 	quantity: Phaser.GameObjects.Text
 	color: Color
 
@@ -42,27 +43,34 @@ export class AmmoGauge extends GameObjects.Container {
 		)
 	}
 
-	constructor(scene: Scene, x: number, y: number, color: Color, HORIZONTAL_MARGIN: number) {
+	constructor(scene: Scene, color: Color, corner: Corner) {
+		const bounds = scene.physics.world.bounds
+		const topHalf = corner === 'top-left' || corner === 'top-right'
+		const leftHalf = corner === 'top-left' || corner === 'bottom-left'
+		const screenX = leftHalf ? -(HUD.gaugeWidth / 2) - HUD.edgeInset : scene.physics.world.bounds.width + (HUD.gaugeWidth / 2) + HUD.edgeInset
+		const x = screenX
+		const y = topHalf ? HUD.topMargin : bounds.height - HUD.bottomMargin
+
 		super(scene, x, y)
 
 		this.mainScene = scene
-		const edgeGap = 64
-		const projectileIcon = scene.add.image(HORIZONTAL_MARGIN - edgeGap - 42, y - 30, `projectile_${color}`).setScale(1.6)
-		const frame = scene.add.nineslice(HORIZONTAL_MARGIN - edgeGap, y, 'panel', undefined, 100, 30, 6, 6, 6, 6).setDepth(100)
 		this.color = color
-		this.quantity = scene.add.text(HORIZONTAL_MARGIN - edgeGap - 32, y - 36, `x${this.counter}`, {
+
+		const frame = scene.add.nineslice(0, 0, 'panel', undefined, HUD.frameWidth, HUD.frameHeight, 6, 6, 6, 6).setDepth(HUD.depthFrame)
+		const projectileIcon = scene.add.image(-HUD.iconOffsetX, HUD.iconOffsetY, `projectile_${color}`).setScale(HUD.iconScale)
+		this.quantity = scene.add.text(-HUD.textOffsetX, -HUD.textOffsetY, `x${this.counter}`, {
 			fontSize: '18px',
 			fontFamily: 'PixelifySans-Medium'
-		}).setDepth(100)
-		this.bg = scene.add.rectangle(HORIZONTAL_MARGIN - edgeGap, y, 90, 24, 0x000000).setDepth(0)
-		this.fill = scene.add.nineslice(HORIZONTAL_MARGIN - edgeGap - 45, y, `${color}_fill`, undefined, this.gaugeWidth, 24, 3, 3, 4, 8).setDepth(50) 
+		}).setDepth(HUD.depthFrame)
+		this.bg = scene.add.rectangle(0, 0, HUD.gaugeWidth, HUD.fillHeight, 0x000000).setDepth(HUD.depthBg)
+		this.fill = scene.add.nineslice(HUD.fillOffset, 0, `${color}_fill`, undefined, this.gaugeWidth, HUD.fillHeight, 3, 3, 4, 8).setDepth(HUD.depthFill)
 		this.fill.setOrigin(0, 0.5)
 		this.add(this.bg)
 		this.add(this.fill)
 		this.add(frame)
 		this.add(this.quantity)
 		this.add(projectileIcon)
-		this.setDepth(100)
+		this.setDepth(HUD.depthFrame)
 		scene.add.existing(this)
 		scene.events.on(Scenes.Events.UPDATE, this.update, this)
 	}
@@ -70,18 +78,15 @@ export class AmmoGauge extends GameObjects.Container {
 	consumeGauge() {
 		if (this.recharging || this.gaugeWidth <= 0)
 			return
-		if (this.gaugeWidth > 0)
-		{
-			this.gaugeWidth -= 18
-			if (this.counter > 0)
-				this.quantity.setText(`x${--this.counter}`)
-			this.mainScene.tweens.add({
-				targets: this.fill,
-				width: this.gaugeWidth,
-				duration: 200,
-				ease: 'Sine.easeOut'
-			})
-		}
+		this.gaugeWidth -= HUD.drainPerShot
+		if (this.counter > 0)
+			this.quantity.setText(`x${--this.counter}`)
+		this.mainScene.tweens.add({
+			targets: this.fill,
+			width: this.gaugeWidth,
+			duration: 200,
+			ease: 'Sine.easeOut'
+		})
 		if (this.gaugeWidth <= 0)
 			this.recharge()
 	}
@@ -91,30 +96,25 @@ export class AmmoGauge extends GameObjects.Container {
 		if (this.alarmTween) this.alarmTween.stop()
 		this.alarmOn = false
 		this.bg.setFillStyle(0x000000)
-
-		// this.mainScene.events.emit("disable_can_fire")
-		this.canFire = false;
+		this.canFire = false
 
 		this.mainScene.tweens.add({
 			targets: this,
-			gaugeWidth: 90,
-			duration: 5000,
+			gaugeWidth: HUD.gaugeWidth,
+			duration: HUD.rechargeMs,
 			ease: 'Sine.easeOut',
 			onUpdate: () => { this.fill.width = this.gaugeWidth },
-		    onComplete: () => { 
+			onComplete: () => {
 				this.recharging = false
-				this.counter = 5
+				this.counter = HUD.initialAmmo
 				this.quantity.setText(`x${this.counter}`)
-
-				// this.mainScene.events.emit("enable_can_fire")
 				this.canFire = true
-
 			}
 		})
 	}
 
 	update() {
-		if (this.gaugeWidth <= 18 && !this.alarmOn && !this.recharging) {
+		if (this.gaugeWidth <= HUD.drainPerShot && !this.alarmOn && !this.recharging) {
 			const from = Display.Color.ValueToColor(0x000000)
 			const to = Display.Color.ValueToColor(0xFF0000)
 			this.alarmOn = true
@@ -130,9 +130,5 @@ export class AmmoGauge extends GameObjects.Container {
 				}
 			})
 		}
-		// if (this.recharging)
-		// 	this.canFire = false;
-		// else
-		// 	this.canFire = true;
 	}
 }

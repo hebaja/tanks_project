@@ -1,7 +1,9 @@
 import { Physics, Input, Scenes, Scene } from 'phaser'
 import { Math as PhaserMath } from 'phaser'
 import { Projectile } from './Projectile'
-import { AmmoGauge } from './AmmoGauge';
+import { AmmoGauge } from './AmmoGauge'
+import { Color } from '../config/color'
+import { SPAWN_CORNERS, TANK_CONFIG } from '../config/layout'
 
 type TankControlsA = {
 	A: Input.Keyboard.Key;
@@ -19,13 +21,6 @@ type TankControlsB = {
 	enter: Input.Keyboard.Key;
 }
 
-export enum Color {
-	blue = 'blue',
-	red = 'red',
-	green = 'green',
-	sand = 'sand',
-	dark = 'dark'
-}
 
 type Pair = [x: number, y: number];
 
@@ -53,12 +48,11 @@ export class Tank extends Physics.Arcade.Sprite {
 		scene.load.image(Color.blue, 'sprites/tank_blue.png')
 		scene.load.image(Color.red, 'sprites/tank_red.png')
 		scene.load.image(Color.green, 'sprites/tank_green.png')
-		scene.load.image(Color.sand, 'sprites/tank_sand.png')
 		scene.load.image(Color.dark, 'sprites/tank_dark.png')
 		scene.load.image('spark', 'sprites/shotOrange.png')
 	}
 
-	constructor(scene: Scene, x: number, y: number, color: Color, index: number, group: Phaser.Physics.Arcade.Group, HORIZONTAL_MARGIN: number) {
+	constructor(scene: Scene, x: number, y: number, color: Color, index: number, group: Phaser.Physics.Arcade.Group) {
 		super(scene, x, y, color)
 		this.keyboard = scene.input.keyboard
 		if (!this.keyboard) {
@@ -90,19 +84,12 @@ export class Tank extends Physics.Arcade.Sprite {
 				down: Input.Keyboard.KeyCodes.DOWN,
 				enter: Input.Keyboard.KeyCodes.ENTER
 			})
-		if (this.playerIndex == 0)
-			this.angle = 0
+		if (SPAWN_CORNERS[color] == 'top-left' || SPAWN_CORNERS[color] == 'top-right')
+			this.angle = TANK_CONFIG.faceDown
 		else
-			this.angle = 180
+			this.angle = TANK_CONFIG.faceUp
 
-		if (color == Color.blue)	
-			this.ammoGauge = new AmmoGauge(scene, 160, 32, color, HORIZONTAL_MARGIN)
-		else if (color == Color.red)
-			this.ammoGauge = new AmmoGauge(scene,  160, 462, color, HORIZONTAL_MARGIN)
-		else if (color == Color.green)
-			this.ammoGauge = new AmmoGauge(scene,  1248, 462, color, HORIZONTAL_MARGIN)
-		else if (color == Color.dark)
-			this.ammoGauge = new AmmoGauge(scene,  1248, 32, color, HORIZONTAL_MARGIN)
+		this.ammoGauge = new AmmoGauge(scene, color, SPAWN_CORNERS[color])
 	}
 
 	destroy(fromScene?: boolean): void {
