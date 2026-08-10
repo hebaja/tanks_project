@@ -12,7 +12,7 @@ export class Game extends Scene {
 	barrelGroup: Phaser.Physics.Arcade.Group
 	tankGroup: Phaser.Physics.Arcade.Group
 	projectileGroup: Phaser.Physics.Arcade.Group
-	ammoGauge: AmmoGauge
+	//ammoGauge: AmmoGauge
 
 	constructor() {
 		super('Game');
@@ -60,7 +60,7 @@ export class Game extends Scene {
 
 		this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
 
-		this.ammoGauge = new AmmoGauge(this, 160, 32, -HORIZONTAL_MARGIN)
+		// this.ammoGauge = new AmmoGauge(this, 160, 32, 'blue', -HORIZONTAL_MARGIN)
 
 
 
@@ -108,8 +108,15 @@ export class Game extends Scene {
 		this.projectileGroup = this.physics.add.group()
 		this.barrelGroup = this.physics.add.group()
 
-		new Tank(this, 25, 25, Color.blue, 0, this.tankGroup)
-		new Tank(this, 925, 925, Color.red, 1, this.tankGroup)
+		// 25, 25, Color.blue
+		// 25, 925, Color.red
+		// 925, 925, Color.green
+		// 925, 25, Color.dark
+		
+		new Tank(this, 25, 25, Color.blue, Tank.tankIndex++, this.tankGroup, -HORIZONTAL_MARGIN)
+		new Tank(this, 25, 925, Color.red, Tank.tankIndex++, this.tankGroup, -HORIZONTAL_MARGIN)
+		new Tank(this, 925, 925, Color.green, Tank.tankIndex++, this.tankGroup, -HORIZONTAL_MARGIN)
+		new Tank(this, 925, 25, Color.dark, Tank.tankIndex++, this.tankGroup, -HORIZONTAL_MARGIN)
 
 		blocksLayer.setCollisionByExclusion([-1]);
 		blocksHardLayer.setCollisionByExclusion([-1]);
@@ -128,10 +135,6 @@ export class Game extends Scene {
 		this.physics.add.collider(this.tankGroup, this.barrelGroup)
 
 		this.events.on('projectileFired', (projectile: Projectile) => {
-		
-			// this.fill.setSlices(50, 24, 3, 3, 4, 8)
-			this.ammoGauge.consumeGauge()
-
 
 			this.physics.add.collider(
 				projectile,

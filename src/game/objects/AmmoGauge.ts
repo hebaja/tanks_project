@@ -13,6 +13,7 @@ export class AmmoGauge extends GameObjects.Container {
 	canFire: boolean = true
 	counter: number = 5
 	quantity: Phaser.GameObjects.Text
+	color: Color
 
 	static preload(scene: Scene) {
 		scene.load.image(
@@ -20,8 +21,20 @@ export class AmmoGauge extends GameObjects.Container {
 			'bars/panel.png'
 		)
 		scene.load.image(
-			'fill',
+			'blue_fill',
 			'bars/blue_fill.png'
+		)
+		scene.load.image(
+			'red_fill',
+			'bars/red_fill.png'
+		)
+		scene.load.image(
+			'green_fill',
+			'bars/green_fill.png'
+		)
+		scene.load.image(
+			'dark_fill',
+			'bars/dark_fill.png'
 		)
 		scene.load.font(
 			'PixelifySans-Medium',
@@ -29,33 +42,27 @@ export class AmmoGauge extends GameObjects.Container {
 		)
 	}
 
-	constructor(scene: Scene, x: number, y: number, HORIZONTAL_MARGIN: number) {
+	constructor(scene: Scene, x: number, y: number, color: Color, HORIZONTAL_MARGIN: number) {
 		super(scene, x, y)
 
 		this.mainScene = scene
 		const edgeGap = 64
-		
-		this.quantity = scene.add.text(HORIZONTAL_MARGIN - edgeGap - 28, y - 38, `x${this.counter}`, {
+		const projectileIcon = scene.add.image(HORIZONTAL_MARGIN - edgeGap - 42, y - 30, `projectile_${color}`).setScale(1.6)
+		const frame = scene.add.nineslice(HORIZONTAL_MARGIN - edgeGap, y, 'panel', undefined, 100, 30, 6, 6, 6, 6).setDepth(100)
+		this.color = color
+		this.quantity = scene.add.text(HORIZONTAL_MARGIN - edgeGap - 32, y - 36, `x${this.counter}`, {
 			fontSize: '18px',
 			fontFamily: 'PixelifySans-Medium'
 		}).setDepth(100)
-
-		const color = 'blue'
-
-		scene.add.image(HORIZONTAL_MARGIN + 56, y, `projectile_${color}`).setScale(1.6)
-
-		
 		this.bg = scene.add.rectangle(HORIZONTAL_MARGIN - edgeGap, y, 90, 24, 0x000000).setDepth(0)
-
-		this.fill = scene.add.nineslice(HORIZONTAL_MARGIN - edgeGap - 45, y, 'fill', undefined, this.gaugeWidth, 24, 3, 3, 4, 8).setDepth(50) 
-		const frame = scene.add.nineslice(HORIZONTAL_MARGIN - edgeGap, y, 'panel', undefined, 100, 30, 6, 6, 6, 6).setDepth(100)
+		this.fill = scene.add.nineslice(HORIZONTAL_MARGIN - edgeGap - 45, y, `${color}_fill`, undefined, this.gaugeWidth, 24, 3, 3, 4, 8).setDepth(50) 
 		this.fill.setOrigin(0, 0.5)
 		this.add(this.bg)
 		this.add(this.fill)
 		this.add(frame)
 		this.add(this.quantity)
+		this.add(projectileIcon)
 		this.setDepth(100)
-
 		scene.add.existing(this)
 		scene.events.on(Scenes.Events.UPDATE, this.update, this)
 	}
@@ -85,8 +92,8 @@ export class AmmoGauge extends GameObjects.Container {
 		this.alarmOn = false
 		this.bg.setFillStyle(0x000000)
 
-
-		this.mainScene.events.emit("disable_can_fire")
+		// this.mainScene.events.emit("disable_can_fire")
+		this.canFire = false;
 
 		this.mainScene.tweens.add({
 			targets: this,
@@ -98,7 +105,10 @@ export class AmmoGauge extends GameObjects.Container {
 				this.recharging = false
 				this.counter = 5
 				this.quantity.setText(`x${this.counter}`)
-				this.mainScene.events.emit("enable_can_fire")
+
+				// this.mainScene.events.emit("enable_can_fire")
+				this.canFire = true
+
 			}
 		})
 	}
@@ -120,9 +130,9 @@ export class AmmoGauge extends GameObjects.Container {
 				}
 			})
 		}
-		if (this.recharging)
-			this.canFire = false;
-		else
-			this.canFire = true;
+		// if (this.recharging)
+		// 	this.canFire = false;
+		// else
+		// 	this.canFire = true;
 	}
 }

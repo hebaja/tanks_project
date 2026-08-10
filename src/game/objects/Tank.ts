@@ -1,6 +1,7 @@
 import { Physics, Input, Scenes, Scene } from 'phaser'
 import { Math as PhaserMath } from 'phaser'
 import { Projectile } from './Projectile'
+import { AmmoGauge } from './AmmoGauge';
 
 type TankControlsA = {
 	A: Input.Keyboard.Key;
@@ -28,19 +29,25 @@ export enum Color {
 
 type Pair = [x: number, y: number];
 
+// 25, 25, Color.blue
+// 25, 925, Color.red
+// 925, 925, Color.green
+// 925, 25, Color.dark
+
 export class Tank extends Physics.Arcade.Sprite {
 	private controlsA: TankControlsA
 	private controlsB: TankControlsB
 	private keyboard: any
 	private mainScene: Scene
 	private projectile: Projectile | null = null
+	private ammoGauge: AmmoGauge
 	private sparkShot?: Phaser.GameObjects.Sprite
 	private speed: number = 150
 	private turnSpeed: number = 2
 	private isSlow: boolean = false
 	private color: Color
 	private playerIndex: number
-	private canFire: boolean = true
+	static	tankIndex: number = 0
 
 	static preload(scene: Scene) {
 		scene.load.image(Color.blue, 'sprites/tank_blue.png')
@@ -51,7 +58,7 @@ export class Tank extends Physics.Arcade.Sprite {
 		scene.load.image('spark', 'sprites/shotOrange.png')
 	}
 
-	constructor(scene: Scene, x: number, y: number, color: Color, index: number, group: Phaser.Physics.Arcade.Group) {
+	constructor(scene: Scene, x: number, y: number, color: Color, index: number, group: Phaser.Physics.Arcade.Group, HORIZONTAL_MARGIN: number) {
 		super(scene, x, y, color)
 		this.keyboard = scene.input.keyboard
 		if (!this.keyboard) {
@@ -75,7 +82,7 @@ export class Tank extends Physics.Arcade.Sprite {
 				S: Input.Keyboard.KeyCodes.S,
 				J: Input.Keyboard.KeyCodes.J
 			})
-		if (this.playerIndex == 1)
+		if (this.playerIndex != 0)
 			this.controlsB = this.keyboard?.addKeys({
 				left: Input.Keyboard.KeyCodes.LEFT,
 				right: Input.Keyboard.KeyCodes.RIGHT,
@@ -85,28 +92,17 @@ export class Tank extends Physics.Arcade.Sprite {
 			})
 		if (this.playerIndex == 0)
 			this.angle = 0
-		if (this.playerIndex == 1)
+		else
 			this.angle = 180
-		
 
-		scene.events.on(
-			"disable_can_fire",
-			this.disableCanFire,
-			this
-		)
-		scene.events.on(
-			"enable_can_fire",
-			this.enableCanFire,
-			this
-		)
-	}
-
-	disableCanFire() {
-		this.canFire = false;
-	}
-
-	enableCanFire() {
-		this.canFire = true
+		if (color == Color.blue)	
+			this.ammoGauge = new AmmoGauge(scene, 160, 32, color, HORIZONTAL_MARGIN)
+		else if (color == Color.red)
+			this.ammoGauge = new AmmoGauge(scene,  160, 462, color, HORIZONTAL_MARGIN)
+		else if (color == Color.green)
+			this.ammoGauge = new AmmoGauge(scene,  1248, 462, color, HORIZONTAL_MARGIN)
+		else if (color == Color.dark)
+			this.ammoGauge = new AmmoGauge(scene,  1248, 32, color, HORIZONTAL_MARGIN)
 	}
 
 	destroy(fromScene?: boolean): void {
@@ -202,7 +198,7 @@ export class Tank extends Physics.Arcade.Sprite {
 	}
 
 	fire() {
-		if (!this.canFire)
+		if (!this.ammoGauge.canFire)
 			return;
 
 		const tip = this.getTipTank(20)
@@ -220,5 +216,6 @@ export class Tank extends Physics.Arcade.Sprite {
 		this.projectile.once('destroy', () => {
 			this.projectile = null
 		})
+		this.ammoGauge.consumeGauge()
 	}
 }
